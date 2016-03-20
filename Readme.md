@@ -121,15 +121,32 @@ Node state machine:
     +---------------------|              |<-----------------------|                  |
     |                     +--------------+                        +------------------+
     |                          ^   ^
-    | Incoming message         |   |                    Yield
-    | received                 |   +--------------------------------------------------------+
-    |                          |       Commit                                               |
+    | Incoming                 |   |                    Yield
+    | message                  |   +--------------------------------------------------------+
+    | received                 |       Commit                                               |
     |                          +---------------------------------+                          |
     V                                                            |                          |
 +-------------------+  Start       +-------------+  Update  +----------+  Rollback  +---------------------+
-|                   |------------->|             | -------->|          |----------->|                     |
-|  IncomingReceived |  transaction | Started     |          | Updating |            |  TransactionFailed  |
-|                   |              | Transaction |          |          |            |                     |
+|                   |------------->| Started     | -------->|          |----------->|                     |
+|  IncomingReceived |  transaction | Transaction |          | Updating |            |  TransactionFailed  |
+|                   |              |             |          |          |            |                     |
 +-------------------+              +-------------+          +----------+            +---------------------+
   
 ```
+
+Node state transitions:
+-----------------------
+
+| Сигнал | Состояние | Следующее состояние | Действие |
+|--------|-----------|---------------------|----------|
+| - | Connected | Connected | - |
+| StartTransaction | Connected | InTranscaction | Старт транзакции, готовность к приёму апдейта |
+| Update | StartTransaction | Updated | Обновление хранилища, отправка подтверждения |
+| Commit | Updated | Connected | Фиксация состояния хранилища |
+| Rollback | Updated | Connected | Откат изменений последнего обновления |
+| IncomingMessage | Connected | IncomingReceived | Формирование обновления |
+| StartTransaction | IncomingReceived | StartedTransaction | Отправка бродкаста о старте транзакции, ожидание подтверждений |
+| Update | StartedTransaction | Updating | Отправка бродкаста с обновлением |
+| Rollback | Updating | TransactionFailed | Отправка бродкаста с сигналом Rollback |
+| Yield | TransactionFailed | Connected | Запланировать повторное обновление позже |
+| Commit | Updating | Connected | Отправка бродкаста с сигналом Commit |
