@@ -1,8 +1,3 @@
-package ru.asmsoft.p2p;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -25,6 +20,12 @@ import org.springframework.stereotype.Component;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 @Component
 public class NodeConfiguration {
 

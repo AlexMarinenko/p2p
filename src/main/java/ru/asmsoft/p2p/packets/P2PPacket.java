@@ -1,7 +1,3 @@
-package ru.asmsoft.p2p.packets;
-
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 /**
  * The MIT License (MIT)
  *
@@ -24,6 +20,11 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.packets;
+
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 @JsonTypeInfo(use=JsonTypeInfo.Id.CLASS, include= JsonTypeInfo.As.PROPERTY, property="@class")
 abstract public class P2PPacket {
 }

@@ -105,32 +105,32 @@ Node state machine:
 -------------------
 
 ```
-+---------------+  Update   +-----------+                        +---------------+
-|               |---------->|           |                   +--->|               |  
-| InTransaction |           |  Updated  |                   |    | SendingUpdate |                      
-|               |           |           |       UpdateMe    |    |               |                      
-+---------------+           +-----------+                   |    +---------------+
-    ^            Commit/Rollback | |                        |         |
-    |                            | |  +---------------------+         | UpdateSent
-    | Start transaction          | |  |                               |
-    | received                   | |  | +-----------------------------+
-    |                            V V  | V
-    |                     +--------------+     UpdateMeRequest    +-----------------+
-    +---------------------|              |----------------------->|                 |
-                          |  Connected   |     UpdateReceived     | UpdateByRequest |
-    +---------------------|              |<-----------------------|                 |
-    |                     +--------------+                        +-----------------+
-    |                          ^   ^
-    | Incoming                 |   |                    Yield
-    | message                  |   +--------------------------------------------------------+
-    | received                 |       Commit                                               |
-    |                          +---------------------------------+                          |
-    V                                                            |                          |
-+-------------------+  Start       +-------------+  Update  +----------+  Rollback  +---------------------+
-|                   |------------->| Started     | -------->|          |----------->|                     |
-|  IncomingReceived |  transaction | Transaction |          | Updating |            |  TransactionFailed  |
-|                   |              |             |          |          |            |                     |
-+-------------------+              +-------------+          +----------+            +---------------------+
++---------------+  Update   +-------------------+                        
+|               |---------->|                   |                     
+| InTransaction |  Received |  UpdatedByRemote  |                                            
+|               |           |                   |                                     
++---------------+           +-------------------+  UpdateMeRequestReceived  +------------------------+
+    ^                              | |      +------------------------------>|                        |
+    |                       Commit/Rollback |      UpdateByRequestSent      | SendingUpdateByRequest | 
+    |                         Received      |  +--------------------------->|                        |
+    | StartTransactionReceived     | |      |  |                            +------------------------+
+    |                              V V      |  V                         
+    |                           +----------------+  UpdateMeRequestSent     +------------------------+
+    +---------------------------|                |------------------------->|                        |
+                                |    Connected   |  UpdateByRequestReceived | WaitForUpdateByRequest |
+    +---------------------------|                |<-------------------------|                        |
+    |                           +----------------+                          +------------------------+
+    |                                 ^  ^
+    |                                 |  |      RollbackSent
+    | IncomingMessageArrived          |  +-------------------------------------------------+
+    |                                 |         CommitSent                                 | 
+    |                                 +----------------------------------------------+     | 
+    V                                                                                |     | 
++-------------------------+  Start        +--------------------+  Update        +----------------+
+|                         |-------------->|                    | -------------->|                |
+| IncomingMessageReceived |  Transaction  | StartedTransaction |  RemoteNodes   | UpdatingRemote |
+|                         |  Sent         |                    |                |                |
++-------------------------+               +--------------------+                +----------------+
   
 ```
 
@@ -140,17 +140,16 @@ Node state transitions:
 | Сигнал | Состояние | Следующее состояние | Действие |
 |--------|-----------|---------------------|----------|
 | - | Connected | Connected | - |
-| StartTransaction | Connected | InTranscaction | Старт транзакции, готовность к приёму апдейта |
-| Update | StartTransaction | Updated | Обновление хранилища, отправка подтверждения |
-| Commit | Updated | Connected | Фиксация состояния хранилища |
-| Rollback | Updated | Connected | Откат изменений последнего обновления |
-| IncomingMessage | Connected | IncomingReceived | Формирование обновления |
-| StartTransaction | IncomingReceived | StartedTransaction | Отправка бродкаста о старте транзакции, ожидание подтверждений |
-| Update | StartedTransaction | Updating | Отправка бродкаста с обновлением |
-| Rollback | Updating | TransactionFailed | Отправка бродкаста с сигналом Rollback |
-| Yield | TransactionFailed | Connected | Запланировать повторное обновление позже |
-| Commit | Updating | Connected | Отправка бродкаста с сигналом Commit |
-| UpdateMe | Connected | SendingUpdate | Отправка обновления по запросу |
-| UpdateSent | SendingUpdate | Connected | - |
-| UpdateMeRequest | Connected | UpdateByRequest | Отправка запроса на обновление, ожидание ответа |
-| UpdateReceived | UpdateByRequest | Connected | Обновление хранилища |
+| StartTransactionReceived | Connected | InTranscaction | Старт транзакции, готовность к приёму апдейта |
+| UpdateReceived | InTranscaction | UpdatedByRemote | Обновление хранилища, отправка подтверждения |
+| CommitReceived | UpdatedByRemote | Connected | Фиксация состояния хранилища |
+| RollbackReceived | UpdatedByRemote | Connected | Откат изменений последнего обновления |
+| IncomingMessageArrived | Connected | IncomingMessageReceived | Формирование обновления |
+| StartTransactionSent | IncomingMessageReceived | StartedTransaction | Отправка бродкаста о старте транзакции, ожидание подтверждений |
+| UpdateRemoteNodes | StartedTransaction | UpdatingRemote | Отправка бродкаста с обновлением |
+| RollbackSent | UpdatingRemote | Connected | Отправка бродкаста с сигналом Rollback, Запланировать повторное обновление позже |
+| CommitSent | UpdatingRemote | Connected | Отправка бродкаста с сигналом Commit |
+| UpdateMeRequestReceived | Connected | SendingUpdateByRequest | Отправка обновления по запросу |
+| UpdateByRequestSent | SendingUpdateByRequest | Connected | - |
+| UpdateMeRequestSent | Connected | WaitForUpdateByRequest | Отправка запроса на обновление, ожидание ответа |
+| UpdateByRequestReceived | WaitForUpdateByRequest | Connected | Обновление хранилища |

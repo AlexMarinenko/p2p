@@ -1,5 +1,3 @@
-package ru.asmsoft.p2p.fsm;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -22,5 +20,12 @@ package ru.asmsoft.p2p.fsm;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public interface IStateMachine {
+
+package ru.asmsoft.p2p.fsm;
+
+public enum NodeEvents {
+    StartTransactionReceived, UpdateReceived, CommitReceived, RollbackReceived,
+    IncomingMessageArrived, StartTransactionSent, UpdateRemoteNodes, RollbackSent, CommitSent,
+    UpdateMeRequestReceived, UpdateByRequestSent,
+    UpdateMeRequestSent, UpdateByRequestReceived
 }

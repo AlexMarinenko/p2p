@@ -1,5 +1,3 @@
-package ru.asmsoft.p2p.packets;
-
 /**
  * The MIT License (MIT)
  *
@@ -22,6 +20,9 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.packets;
+
 public class PingPacket extends P2PPacket{
     @Override
     public String toString() {

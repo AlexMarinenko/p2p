@@ -1,10 +1,3 @@
-package ru.asmsoft.p2p.incoming;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import ru.asmsoft.p2p.entity.P2PMessage;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -27,6 +20,14 @@ import ru.asmsoft.p2p.entity.P2PMessage;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.incoming;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import ru.asmsoft.p2p.entity.P2PMessage;
+
 @Service
 public class MessageService implements IMessagesService {
 

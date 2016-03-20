@@ -1,5 +1,3 @@
-package ru.asmsoft.p2p.entity;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -22,6 +20,9 @@ package ru.asmsoft.p2p.entity;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.entity;
+
 public class P2PMessage {
 
     private String content;

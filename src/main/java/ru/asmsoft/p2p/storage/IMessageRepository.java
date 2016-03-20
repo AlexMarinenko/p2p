@@ -1,9 +1,3 @@
-package ru.asmsoft.p2p.storage;
-
-import ru.asmsoft.p2p.entity.P2PMessage;
-
-import java.util.Collection;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -26,6 +20,13 @@ import java.util.Collection;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.storage;
+
+import ru.asmsoft.p2p.entity.P2PMessage;
+
+import java.util.Collection;
+
 public interface IMessageRepository {
 
     /**

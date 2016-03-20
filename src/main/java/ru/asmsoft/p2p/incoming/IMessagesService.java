@@ -1,7 +1,3 @@
-package ru.asmsoft.p2p.incoming;
-
-import ru.asmsoft.p2p.entity.P2PMessage;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -24,6 +20,11 @@ import ru.asmsoft.p2p.entity.P2PMessage;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.incoming;
+
+import ru.asmsoft.p2p.entity.P2PMessage;
+
 public interface IMessagesService {
     void handleIncomingMessage(P2PMessage message);
 }

@@ -1,8 +1,3 @@
-package ru.asmsoft.p2p;
-
-import org.springframework.stereotype.Service;
-import ru.asmsoft.p2p.fsm.NodeState;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -25,12 +20,13 @@ import ru.asmsoft.p2p.fsm.NodeState;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@Service
-public class Syncronizer {
 
-    private NodeState state = NodeState.WAITING;
+package ru.asmsoft.p2p.fsm;
 
-
-
-
+public enum NodeStates {
+    CONNECTED,
+    IN_TRANSACTION, UPDATED_BY_REMOTE,
+    SENDING_UPDATE,
+    WAIT_FOR_UPDATE_BY_REQUEST,
+    INCOMING_MESSAGE_RECEIVED, STARTED_TRANSACTION, UPDATING_REMOTE
 }

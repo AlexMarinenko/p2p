@@ -23,11 +23,84 @@
 
 package ru.asmsoft.p2p.fsm;
 
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.statemachine.config.EnableStateMachine;
+import org.springframework.statemachine.config.EnumStateMachineConfigurerAdapter;
+import org.springframework.statemachine.config.builders.StateMachineStateConfigurer;
+import org.springframework.statemachine.config.builders.StateMachineTransitionConfigurer;
 
-@Component
-public class NodeStateMachine implements IStateMachine {
+import java.util.EnumSet;
 
+@Configuration
+@EnableStateMachine
+public class NodeStateMachine extends EnumStateMachineConfigurerAdapter<NodeStates, NodeEvents> {
 
+    @Override
+    public void configure(StateMachineStateConfigurer<NodeStates, NodeEvents> states) throws Exception {
+        states
+            .withStates()
+            .initial(NodeStates.CONNECTED)
+            .states(EnumSet.allOf(NodeStates.class));
+    }
 
+    @Override
+    public void configure(StateMachineTransitionConfigurer<NodeStates, NodeEvents> transitions) throws Exception {
+
+        transitions
+                .withExternal()
+                .source(NodeStates.CONNECTED).target(NodeStates.IN_TRANSACTION)
+                .event(NodeEvents.StartTransactionReceived)
+            .and()
+            .withExternal()
+                .source(NodeStates.IN_TRANSACTION).target(NodeStates.UPDATED_BY_REMOTE)
+                .event(NodeEvents.UpdateReceived)
+            .and()
+                .withExternal()
+                .source(NodeStates.UPDATED_BY_REMOTE).target(NodeStates.CONNECTED)
+                .event(NodeEvents.CommitReceived)
+            .and()
+                .withExternal()
+                .source(NodeStates.UPDATED_BY_REMOTE).target(NodeStates.CONNECTED)
+                .event(NodeEvents.RollbackReceived)
+
+            .and()
+                .withExternal()
+                .source(NodeStates.CONNECTED).target(NodeStates.INCOMING_MESSAGE_RECEIVED)
+                .event(NodeEvents.IncomingMessageArrived)
+            .and()
+                .withExternal()
+                .source(NodeStates.INCOMING_MESSAGE_RECEIVED).target(NodeStates.STARTED_TRANSACTION)
+                .event(NodeEvents.StartTransactionSent)
+            .and()
+                .withExternal()
+                .source(NodeStates.STARTED_TRANSACTION).target(NodeStates.UPDATING_REMOTE)
+                .event(NodeEvents.UpdateRemoteNodes)
+            .and()
+                .withExternal()
+                .source(NodeStates.UPDATING_REMOTE).target(NodeStates.CONNECTED)
+                .event(NodeEvents.CommitSent)
+            .and()
+                .withExternal()
+                .source(NodeStates.UPDATING_REMOTE).target(NodeStates.CONNECTED)
+                .event(NodeEvents.RollbackSent)
+
+            .and()
+                .withExternal()
+                .source(NodeStates.CONNECTED).target(NodeStates.SENDING_UPDATE)
+                .event(NodeEvents.UpdateMeRequestReceived)
+            .and()
+                .withExternal()
+                .source(NodeStates.SENDING_UPDATE).target(NodeStates.CONNECTED)
+                .event(NodeEvents.UpdateByRequestSent)
+
+            .and()
+                .withExternal()
+                .source(NodeStates.CONNECTED).target(NodeStates.WAIT_FOR_UPDATE_BY_REQUEST)
+                .event(NodeEvents.UpdateMeRequestSent)
+                .and()
+                .withExternal()
+                .source(NodeStates.WAIT_FOR_UPDATE_BY_REQUEST).target(NodeStates.CONNECTED)
+                .event(NodeEvents.UpdateByRequestReceived);
+
+    }
 }

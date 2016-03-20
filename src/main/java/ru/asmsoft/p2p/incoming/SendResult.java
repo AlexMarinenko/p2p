@@ -1,5 +1,3 @@
-package ru.asmsoft.p2p.incoming;
-
 /**
  * The MIT License (MIT)
  * <p>
@@ -22,6 +20,9 @@ package ru.asmsoft.p2p.incoming;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
+package ru.asmsoft.p2p.incoming;
+
 public class SendResult {
 
     private boolean success;
