@@ -105,16 +105,16 @@ Node state machine:
 -------------------
 
 ```
-+---------------+  Update   +-----------+
-|               |---------->|           |
-| InTransaction |           |  Updated  |
-|               |           |           |
-+---------------+           +-----------+
-    ^                            | |          
-    |                            | | 
-    | Start transaction          | | Commit/Rollback 
-    | received                   | |
-    |                            V V
++---------------+  Update   +-----------+                        +---------------+
+|               |---------->|           |                   +--->|               |  
+| InTransaction |           |  Updated  |                   |    | SendingUpdate |                      
+|               |           |           |       UpdateMe    |    |               |                      
++---------------+           +-----------+                   |    +---------------+
+    ^            Commit/Rollback | |                        |         |
+    |                            | |  +---------------------+         | UpdateSent
+    | Start transaction          | |  |                               |
+    | received                   | |  | +-----------------------------+
+    |                            V V  | V
     |                     +--------------+       Synchronize      +------------------+
     +---------------------|              |----------------------->|                  |
                           |  Connected   |       Synchronized     |  Synchronization |
@@ -150,3 +150,5 @@ Node state transitions:
 | Rollback | Updating | TransactionFailed | Отправка бродкаста с сигналом Rollback |
 | Yield | TransactionFailed | Connected | Запланировать повторное обновление позже |
 | Commit | Updating | Connected | Отправка бродкаста с сигналом Commit |
+| UpdateMe | Connected | SendingUpdate | Отправка обновления по запросу |
+| UpdateSent | SendingUpdate | Connected | - |
