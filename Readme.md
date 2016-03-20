@@ -115,11 +115,11 @@ Node state machine:
     | Start transaction          | |  |                               |
     | received                   | |  | +-----------------------------+
     |                            V V  | V
-    |                     +--------------+       Synchronize      +------------------+
-    +---------------------|              |----------------------->|                  |
-                          |  Connected   |       Synchronized     |  Synchronization |
-    +---------------------|              |<-----------------------|                  |
-    |                     +--------------+                        +------------------+
+    |                     +--------------+     UpdateMeRequest    +-----------------+
+    +---------------------|              |----------------------->|                 |
+                          |  Connected   |     UpdateReceived     | UpdateByRequest |
+    +---------------------|              |<-----------------------|                 |
+    |                     +--------------+                        +-----------------+
     |                          ^   ^
     | Incoming                 |   |                    Yield
     | message                  |   +--------------------------------------------------------+
@@ -152,3 +152,5 @@ Node state transitions:
 | Commit | Updating | Connected | Отправка бродкаста с сигналом Commit |
 | UpdateMe | Connected | SendingUpdate | Отправка обновления по запросу |
 | UpdateSent | SendingUpdate | Connected | - |
+| UpdateMeRequest | Connected | UpdateByRequest | Отправка запроса на обновление, ожидание ответа |
+| UpdateReceived | UpdateByRequest | Connected | Обновление хранилища |
