@@ -1,11 +1,11 @@
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p.entity;
 
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,5 +22,29 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ConfirmTransactionStartedPacket extends P2PPacket {
+public class P2PMessage {
+
+    private String content;
+
+    public P2PMessage() {
+    }
+
+    public P2PMessage(String content) {
+        this.content = content;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    @Override
+    public String toString() {
+        return "P2PMessage{" +
+                "content='" + content + '\'' +
+                '}';
+    }
 }

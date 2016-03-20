@@ -1,11 +1,21 @@
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p.incoming;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+import ru.asmsoft.p2p.entity.P2PMessage;
 
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,5 +32,19 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ConfirmTransactionStartedPacket extends P2PPacket {
+@RestController
+public class InputController {
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    @Qualifier("incomingMessagesService")
+    IMessagesService messagesService;
+
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
+    public SendResult sendMessage(@RequestBody P2PMessage message){
+        messagesService.handleIncomingMessage(message);
+        return new SendResult(true);
+    }
+
 }

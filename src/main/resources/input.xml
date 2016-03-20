@@ -6,12 +6,11 @@
        xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd   http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd   http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
 
+    <int:gateway id="incomingMessagesService"
+                 service-interface="ru.asmsoft.p2p.incoming.IMessagesService"
+                 default-request-channel="incoming-messages"
+                 default-reply-timeout="3000"/>
 
-    <context:component-scan base-package="ru.asmsoft.p2p"/>
-
-    <bean id="nodeConfiguration" class="ru.asmsoft.p2p.NodeConfiguration"/>
-
-    <import resource="heartbeat.xml"/>
-    <import resource="input.xml"/>
+    <int:channel id="incoming-messages"/>
 
 </beans>

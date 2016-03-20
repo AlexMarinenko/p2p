@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd   http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd   http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <bean id="heartbeat" class="ru.asmsoft.p2p.Heartbeat"/>
+
+    <task:scheduler id="hbScheduler"/>
+
+    <task:scheduled-tasks scheduler="hbScheduler">
+        <task:scheduled ref="heartbeat" method="ping" fixed-rate="#{nodeConfiguration.getHeartbeatPeriod()}"/>
+    </task:scheduled-tasks>
+
+    <!-- Input channel -->
+    <int-ip:udp-inbound-channel-adapter
+            id="inbound-adapter"
+            local-address="0.0.0.0"
+            port="8888"
+            channel="incoming-json"
+            />
+
+    <int:channel id="incoming-json"/>
+
+    <int:chain input-channel="incoming-json">
+        <int:json-to-object-transformer id="deserializer" type="ru.asmsoft.p2p.packets.P2PPacket"/>
+        <int:payload-type-router>
+            <int:mapping type="ru.asmsoft.p2p.packets.PingPacket" channel="incoming-heartbeat"/>
+        </int:payload-type-router>
+    </int:chain>
+
+    <int:channel id="incoming-heartbeat"/>
+
+
+    <!-- Output heartbeat -->
+    <int:channel id="outgoing-heartbeat"/>
+    <int:chain id="output-chain" input-channel="outgoing-heartbeat">
+        <int:object-to-json-transformer id="serializer"/>
+        <int-ip:udp-outbound-channel-adapter
+                id="udp-sender"
+                host="192.168.99.255"
+                port="8888"/>
+    </int:chain>
+
+
+</beans>

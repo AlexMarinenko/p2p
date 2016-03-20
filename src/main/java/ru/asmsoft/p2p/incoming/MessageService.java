@@ -1,11 +1,16 @@
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p.incoming;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import ru.asmsoft.p2p.entity.P2PMessage;
 
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,5 +27,14 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ConfirmTransactionStartedPacket extends P2PPacket {
+@Service
+public class MessageService implements IMessagesService {
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Override
+    public void handleIncomingMessage(P2PMessage message) {
+        logger.info("Handling incoming message: {}", message);
+    }
+
 }

@@ -22,6 +22,8 @@ Client               Node                         Network
    |                   |                             |
    | Incoming message  |                             |
    |------------------>|                             |
+   | Message accepted  |                             |
+   |<------------------|                             |
    |                   |                             |   
    |                   | Start Transaction           |   
    |                   |---------------------------->|
@@ -37,13 +39,13 @@ Client               Node                         Network
    |                   |                             |   
    |                   | Commit                      |
    |                   |---------------------------->|
-   |  Message Received |                             |
-   |<------------------|                             |
+   
+   
       
 ```
 
-Syncronization flow:
---------------------
+Synchronization flow:
+---------------------
 
 ```
 Node                         Network          Selected Node
@@ -96,5 +98,38 @@ Node                         Network
   |        |                    |
   |<-------+                    |
   |                             |
+  
+```
+
+Node state machine:
+-------------------
+
+```
++---------------+  Update   +-----------+
+|               |---------->|           |
+| InTransaction |           |  Updated  |
+|               |           |           |
++---------------+           +-----------+
+    ^                            | |          
+    |                            | | 
+    | Start transaction          | | Commit/Rollback 
+    | received                   | |
+    |                            V V
+    |                     +--------------+       Synchronize      +------------------+
+    +---------------------|              |----------------------->|                  |
+                          |  Connected   |       Synchronized     |  Synchronization |
+    +---------------------|              |<-----------------------|                  |
+    |                     +--------------+                        +------------------+
+    |                          ^   ^
+    | Incoming message         |   |                    Yield
+    | received                 |   +----------------------------------------------------------------------+
+    |                          |       Commit                                                             |
+    |                          +-----------------------------------------------+                          |
+    V                                                                          |                          |
++-------------------+  Start transaction  +--------------------+  Update  +----------+  Rollback  +---------------------+
+|                   |-------------------->|                    | -------->|          |----------->|                     |
+|  IncomingReceived |                     | StartedTransaction |          | Updating |            |  TransactionFailed  |
+|                   |                     |                    |          |          |            |                     |
++-------------------+                     +--------------------+          +----------+            +---------------------+
   
 ```

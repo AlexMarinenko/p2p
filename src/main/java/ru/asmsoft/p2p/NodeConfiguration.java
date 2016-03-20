@@ -1,11 +1,14 @@
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,5 +25,20 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ConfirmTransactionStartedPacket extends P2PPacket {
+@Component
+public class NodeConfiguration {
+
+    @Value("${p2p.heartbeatPeriod}")
+    long heartbeatPeriod;
+
+    @Value("${p2p.heartbeatExpired}")
+    long heartbeatPeriodExpired;
+
+    public long getHeartbeatPeriod() {
+        return heartbeatPeriod;
+    }
+
+    public long getHeartbeatPeriodExpired() {
+        return heartbeatPeriodExpired;
+    }
 }

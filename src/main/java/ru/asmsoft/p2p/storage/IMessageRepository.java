@@ -1,11 +1,15 @@
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p.storage;
+
+import ru.asmsoft.p2p.entity.P2PMessage;
+
+import java.util.Collection;
 
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -22,5 +26,31 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class ConfirmTransactionStartedPacket extends P2PPacket {
+public interface IMessageRepository {
+
+    /**
+     * Is the repository synchronized
+     * @return synchronization status
+     */
+    boolean isSynchronized();
+
+    void setSynchronized(boolean isSynchronized);
+
+    /**
+     * Register new message
+     * @param message the message to register
+     */
+    void registerMessage(P2PMessage message);
+
+    /**
+     * Synchronize the whole DB
+     * @param messages messages to synchronize with
+     */
+    void syncDb(Collection<P2PMessage> messages);
+
+    /**
+     * Get current database version
+     * @return database version
+     */
+    long getDbVersion();
 }
