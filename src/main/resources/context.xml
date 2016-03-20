@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd   http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd   http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+
+
+    <context:component-scan base-package="ru.asmsoft.p2p"/>
+
+    <!-- Input -->
+    <int-ip:udp-inbound-channel-adapter
+            id="inbound-adapter"
+            local-address="0.0.0.0"
+            port="8888"
+            channel="incoming-json"
+            />
+
+    <int:channel id="incoming-json"/>
+    <int:json-to-object-transformer id="deserializer" type="ru.asmsoft.p2p.packets.PingPacket" input-channel="incoming-json" output-channel="incoming"/>
+    <int:channel id="incoming"/>
+
+
+
+    <!-- Output -->
+    <int:channel id="outgoing"/>
+
+    <int:chain id="output-chain" input-channel="outgoing">
+
+        <int:object-to-json-transformer id="serializer"/>
+
+        <int-ip:udp-outbound-channel-adapter
+                id="udp-sender"
+                host="192.168.99.255"
+                port="8888"/>
+
+    </int:chain>
+
+    <int:publish-subscribe-channel id="unknown-packet-received"/>
+    <int:publish-subscribe-channel id="election-request-received"/>
+    <int:publish-subscribe-channel id="election-vote-received"/>
+    <int:publish-subscribe-channel id="heartbeat-received"/>
+    <int:publish-subscribe-channel id="heartbeat-response-received"/>
+
+</beans>
