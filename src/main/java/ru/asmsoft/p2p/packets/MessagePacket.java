@@ -23,5 +23,34 @@
 
 package ru.asmsoft.p2p.packets;
 
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
+
+import java.util.List;
+
 public class MessagePacket extends P2PPacket {
+
+    private long dbVersion;
+    private List<P2PMessage> messages;
+
+    public MessagePacket(long dbVersion, List<P2PMessage> messages){
+        super();
+        this.dbVersion = dbVersion;
+        this.messages = messages;
+    }
+
+    public long getDbVersion() {
+        return dbVersion;
+    }
+
+    public List<P2PMessage> getMessages() {
+        return messages;
+    }
+
+    @Override
+    public String toString() {
+        return "MessagePacket{" +
+                "uuid=" + uuid +
+                ", messages=" + messages.size() +
+                '}';
+    }
 }

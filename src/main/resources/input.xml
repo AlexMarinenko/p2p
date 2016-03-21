@@ -2,15 +2,42 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:int="http://www.springframework.org/schema/integration"
-       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd   http://www.springframework.org/schema/integration/http http://www.springframework.org/schema/integration/http/spring-integration-http.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd   http://www.springframework.org/schema/integration/mail http://www.springframework.org/schema/integration/mail/spring-integration-mail.xsd http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd">
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+       http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
-    <int:gateway id="incomingMessagesService"
-                 service-interface="ru.asmsoft.p2p.incoming.IMessagesService"
-                 default-request-channel="incoming-messages"
-                 default-reply-timeout="3000"/>
+       <int:channel id="incoming-messages"/>
 
-    <int:channel id="incoming-messages"/>
+       <!-- Input channel -->
+       <int-ip:udp-inbound-channel-adapter
+               id="inbound-adapter"
+               local-address="#{nodeConfiguration.getListenerAddress()}"
+               port="#{nodeConfiguration.getPort()}"
+               channel="incoming-json"/>
+
+       <int:channel id="incoming-json"/>
+
+       <int:chain input-channel="incoming-json">
+              <int:json-to-object-transformer id="deserializer" type="ru.asmsoft.p2p.packets.P2PPacket"/>
+              <int:payload-type-router id="incoming-packets-router">
+                  <int:mapping type="ru.asmsoft.p2p.packets.PingPacket" channel="incoming-heartbeat"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.StartTransactionPacket" channel="incoming-start-transaction"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.ConfirmTransactionStartedPacket" channel="outgoing-start-transaction-channel"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.MessagePacket" channel="incoming-update-transaction"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.MessageReceivedPacket" channel="outgoing-update-transaction-channel"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.CommitTransactionPacket" channel="incoming-commit-transaction"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.RollbackTransactionPacket" channel="incoming-rollback-transaction"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.UpdateMeResponse" channel="outgoing-update-me-channel"/>
+              </int:payload-type-router>
+       </int:chain>
+
+       <int:channel id="incoming-heartbeat"/>
+       <int:channel id="incoming-start-transaction"/>
+       <int:channel id="incoming-update-transaction"/>
+       <int:channel id="incoming-commit-transaction"/>
+       <int:channel id="incoming-rollback-transaction"/>
 
 </beans>

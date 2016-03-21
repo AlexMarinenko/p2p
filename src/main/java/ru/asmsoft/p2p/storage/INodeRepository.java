@@ -22,7 +22,7 @@
 
 package ru.asmsoft.p2p.storage;
 
-import ru.asmsoft.p2p.entity.Node;
+import ru.asmsoft.p2p.storage.entity.Node;
 
 import java.util.Collection;
 
@@ -57,4 +57,10 @@ public interface INodeRepository {
      * @return if the repository is ready and filled up
      */
     boolean isInitialized();
+
+    /**
+     * Is there any node stored
+     * @return if nodes
+     */
+    boolean isEmpty();
 }

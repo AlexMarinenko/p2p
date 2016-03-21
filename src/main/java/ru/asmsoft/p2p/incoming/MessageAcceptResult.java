@@ -21,31 +21,31 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p.entity;
+package ru.asmsoft.p2p.incoming;
 
-public class P2PMessage {
+public class MessageAcceptResult {
 
-    private String content;
+    private boolean success;
 
-    public P2PMessage() {
+    public MessageAcceptResult() {
     }
 
-    public P2PMessage(String content) {
-        this.content = content;
+    public MessageAcceptResult(boolean success) {
+        this.success = success;
     }
 
-    public String getContent() {
-        return content;
+    public boolean isSuccess() {
+        return success;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setSuccess(boolean success) {
+        this.success = success;
     }
 
     @Override
     public String toString() {
-        return "P2PMessage{" +
-                "content='" + content + '\'' +
+        return "SendResult{" +
+                "success=" + success +
                 '}';
     }
 }

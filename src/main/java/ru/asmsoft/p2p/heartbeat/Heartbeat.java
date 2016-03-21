@@ -21,7 +21,7 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p;
+package ru.asmsoft.p2p.heartbeat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,15 +31,21 @@ import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
+import ru.asmsoft.p2p.configuration.INodeConfiguration;
+import ru.asmsoft.p2p.fsm.NodeEvents;
+import ru.asmsoft.p2p.fsm.NodeStates;
 import ru.asmsoft.p2p.packets.PingPacket;
+import ru.asmsoft.p2p.packets.UpdateMePacket;
+import ru.asmsoft.p2p.packets.UpdateMeResponse;
+import ru.asmsoft.p2p.storage.IMessageRepository;
 import ru.asmsoft.p2p.storage.INodeRepository;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.io.IOException;
+import java.net.DatagramSocket;
 
-@Service
+@Service("heartbeat")
 public class Heartbeat {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -48,29 +54,38 @@ public class Heartbeat {
     INodeRepository nodeRepository;
 
     @Autowired
-    @Qualifier("outgoing-heartbeat")
+    IMessageRepository messageRepository;
+
+    @Autowired
+    @Qualifier("outgoing-broadcast")
     private MessageChannel outgoingHeartbeatChannel;
+
     private Message<PingPacket> pingPacket;
 
-    @PostConstruct
-    public void init() throws IOException {
-        pingPacket = MessageBuilder.withPayload(new PingPacket()).build();
-    }
-
-    @PreDestroy
-    public void shutdown() throws IOException {
-        // some actions before destroy
-    }
+    @Autowired
+    private ISelfUpdateService selfUpdateService;
 
     public void ping() throws IOException {
+        pingPacket = MessageBuilder.withPayload(new PingPacket(messageRepository.getDbVersion())).build();
         logger.trace("Send: {}", pingPacket);
         outgoingHeartbeatChannel.send(pingPacket);
     }
 
     @ServiceActivator(inputChannel = "incoming-heartbeat")
-    public void handleIncomingPing(Message message){
+    public void handleIncomingPing(Message<PingPacket> message){
         logger.trace("Received: {}", message);
-        nodeRepository.registerNode((String) message.getHeaders().get("ip_address"));
+
+        String nodeAddress = (String) message.getHeaders().get("ip_address");
+        nodeRepository.registerNode(nodeAddress);
+
+        PingPacket packet = message.getPayload();
+
+        // If our DB is outdated
+        if (messageRepository.getDbVersion() < packet.getDbVersion() ){
+            selfUpdateService.startNodeUpdate(nodeAddress);
+        }
+
     }
+
 
 }

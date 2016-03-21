@@ -28,8 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import ru.asmsoft.p2p.entity.Node;
-import ru.asmsoft.p2p.NodeConfiguration;
+import ru.asmsoft.p2p.configuration.INodeConfiguration;
+import ru.asmsoft.p2p.storage.entity.Node;
 
 import javax.annotation.PostConstruct;
 import java.util.Collection;
@@ -42,8 +42,9 @@ import java.util.concurrent.TimeUnit;
  * In-memory Nodes interface implementation.
  * ConcurentHashMap based storage.
  */
-@Repository
-public class NodesRepository implements INodeRepository, RemovalListener<String, Node> {
+
+@Repository("nodesRepository")
+public class MemoryNodesRepository implements INodeRepository, RemovalListener<String, Node> {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -51,7 +52,7 @@ public class NodesRepository implements INodeRepository, RemovalListener<String,
     private boolean isInitialised;
 
     @Autowired
-    NodeConfiguration config;
+    INodeConfiguration config;
 
     @PostConstruct
     public void init(){
@@ -104,6 +105,11 @@ public class NodesRepository implements INodeRepository, RemovalListener<String,
     @Override
     public boolean isInitialized() {
         return isInitialised;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return nodes.size() > 0;
     }
 
     @Override

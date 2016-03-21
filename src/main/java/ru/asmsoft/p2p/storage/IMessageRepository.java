@@ -23,9 +23,10 @@
 
 package ru.asmsoft.p2p.storage;
 
-import ru.asmsoft.p2p.entity.P2PMessage;
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface IMessageRepository {
 
@@ -45,13 +46,40 @@ public interface IMessageRepository {
 
     /**
      * Synchronize the whole DB
+     * @param dbVersion the version to set
      * @param messages messages to synchronize with
      */
-    void syncDb(Collection<P2PMessage> messages);
+    void syncDb(long dbVersion, Collection<P2PMessage> messages);
 
     /**
      * Get current database version
      * @return database version
      */
     long getDbVersion();
+
+    /**
+     * Updates database version
+     * @param version new version number
+     */
+    void updateDbVersion(long version);
+
+    /**
+     * Registers a changeset for update
+     * @param dbVersion dbVersion
+     * @param messages messages in the changeset
+     */
+    void registerChangeset(long dbVersion, List<P2PMessage> messages);
+
+    /**
+     * Applies the changeset by dbVersion
+     * @param dbVersion the version to apply
+     */
+    void applyChangeset(long dbVersion) throws NoChangesetFoundException;
+
+    /**
+     * Cancel pending changeset and return it's content
+     * @param dbVersion the pending version to cancel
+     * @return messages collection in the changeset
+     */
+    Collection<P2PMessage> cancelChangeset(long dbVersion) throws NoChangesetFoundException;
 }

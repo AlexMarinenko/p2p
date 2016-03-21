@@ -24,8 +24,24 @@
 package ru.asmsoft.p2p.packets;
 
 public class PingPacket extends P2PPacket{
+
+    private long dbVersion;
+
+    public PingPacket(){}
+
+    public PingPacket(long dbVersion){
+        this.dbVersion = dbVersion;
+    }
+
+    public long getDbVersion() {
+        return dbVersion;
+    }
+
     @Override
     public String toString() {
-        return "PingPacket{}";
+        return "PingPacket{" +
+                "uuid=" + uuid +
+                ", dbVersion=" + dbVersion +
+                '}';
     }
 }

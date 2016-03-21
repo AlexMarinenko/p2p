@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+
+    <int:channel id="outgoing-start-transaction-channel">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel1"/>
+        </int:interceptors>
+    </int:channel>
+
+    <int:logging-channel-adapter id="loggingChannel1" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.OutgoingTransactionManager"/>
+
+    <int:aggregator
+            ref="outgoingTransactionManager"
+            input-channel="outgoing-start-transaction-channel"
+            correlation-strategy-method="getCorrelationKeyForStart"
+            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
+            release-strategy-method="isTransactionStarted"
+            send-partial-result-on-expiry="false"
+            discard-channel="outgoing-start-transaction-failed-channel"
+            output-channel="outgoing-start-transaction-started-channel"
+            />
+
+    <int:channel id="outgoing-start-transaction-started-channel"/>
+    <int:channel id="outgoing-start-transaction-failed-channel"/>
+
+    <int:channel id="outgoing-update-transaction-channel">
+        <int:interceptors>
+            <int:wire-tap channel="loggingChannel2"/>
+        </int:interceptors>
+    </int:channel>
+
+    <int:logging-channel-adapter id="loggingChannel2" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.OutgoingTransactionManager"/>
+
+    <int:aggregator
+            ref="outgoingTransactionManager"
+            input-channel="outgoing-update-transaction-channel"
+            correlation-strategy-method="getCorrelationKeyForUpdate"
+            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
+            release-strategy-method="isTransactionConfirmed"
+            send-partial-result-on-expiry="false"
+            discard-channel="outgoing-update-transaction-failed-channel"
+            output-channel="outgoing-update-transaction-confirmed-channel"
+            />
+
+    <int:channel id="outgoing-update-transaction-confirmed-channel"/>
+    <int:channel id="outgoing-update-transaction-failed-channel"/>
+
+
+</beans>

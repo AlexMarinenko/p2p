@@ -24,4 +24,20 @@
 package ru.asmsoft.p2p.packets;
 
 public class ConfirmTransactionStartedPacket extends P2PPacket {
+
+    public ConfirmTransactionStartedPacket(){
+        super();
+    }
+
+    public ConfirmTransactionStartedPacket(StartTransactionPacket txPacket){
+        super();
+        uuid = txPacket.getUuid();
+    }
+
+    @Override
+    public String toString() {
+        return "ConfirmTransactionStartedPacket{" +
+                "uuid=" + uuid +
+                "}";
+    }
 }

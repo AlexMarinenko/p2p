@@ -1,7 +1,7 @@
 /**
  * The MIT License (MIT)
  * <p>
- * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
+ * Copyright (c) 21.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
  * <p>
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,49 +21,23 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p.storage;
 
-import org.springframework.stereotype.Repository;
-import ru.asmsoft.p2p.entity.P2PMessage;
+package ru.asmsoft.p2p.fsm;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.statemachine.listener.StateMachineListenerAdapter;
+import org.springframework.statemachine.state.State;
+import org.springframework.stereotype.Component;
 
-/**
- * In-memory message repository implementation
- */
+@Component
+public class NodeStateMachineListener extends StateMachineListenerAdapter<NodeStates, NodeEvents> {
 
-@Repository
-public class MessageRepository implements IMessageRepository{
-
-    private long version = 0L;
-
-    private boolean isSynchronized;
-
-    private Collection<P2PMessage> messages = new ArrayList<P2PMessage>();
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public boolean isSynchronized() {
-        return isSynchronized;
+    public void stateChanged(State<NodeStates, NodeEvents> from, State<NodeStates, NodeEvents> to) {
+        logger.info("State changed from [{}] to [{}]", (from != null ? from.getId():"null"), (to != null ? to.getId():"null"));
     }
 
-    @Override
-    public void setSynchronized(boolean isSynchronized){
-        this.isSynchronized = isSynchronized;
-    }
-
-    @Override
-    public void registerMessage(P2PMessage message) {
-
-    }
-
-    @Override
-    public void syncDb(Collection<P2PMessage> messages) {
-
-    }
-
-    @Override
-    public long getDbVersion() {
-        return version;
-    }
 }

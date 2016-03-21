@@ -1,9 +1,13 @@
+package ru.asmsoft.p2p.heartbeat;
+
+import ru.asmsoft.p2p.packets.UpdateMeResponse;
+
 /**
  * The MIT License (MIT)
- *
- * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * Copyright (c) 21.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -20,29 +24,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+public interface ISelfUpdateService {
 
-package ru.asmsoft.p2p.packets;
+    /**
+     * Starts selfupdate procedure
+     * @param nodeAddress note to sync with
+     */
+    void startNodeUpdate(String nodeAddress);
 
-public class RollbackTransactionPacket extends P2PPacket {
-
-    private long dbVersion;
-
-    public RollbackTransactionPacket() {
-    }
-
-    public RollbackTransactionPacket(long dbVersion) {
-        this.dbVersion = dbVersion;
-    }
-
-    public long getDbVersion() {
-        return dbVersion;
-    }
-
-    @Override
-    public String toString() {
-        return "RollbackTransactionPacket{" +
-                "dbVersion=" + dbVersion +
-                ", uuid=" + uuid +
-                "}";
-    }
+    /**
+     * Handles arrived DB update
+     * @param updateMeResponse update response packet
+     */
+    void updateReceived(UpdateMeResponse updateMeResponse);
 }

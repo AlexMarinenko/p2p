@@ -24,4 +24,15 @@
 package ru.asmsoft.p2p.packets;
 
 public class StartTransactionPacket extends P2PPacket {
+
+    public StartTransactionPacket() {
+        super();
+    }
+
+    @Override
+    public String toString() {
+        return "StartTransactionPacket{" +
+                "uuid=" + uuid +
+                "}";
+    }
 }

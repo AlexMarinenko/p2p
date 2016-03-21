@@ -1,7 +1,13 @@
+package ru.asmsoft.p2p.packets;
+
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
+
+import java.util.Collection;
+
 /**
  * The MIT License (MIT)
  * <p>
- * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
+ * Copyright (c) 21.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
  * <p>
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,26 +26,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+public class UpdateMeResponse extends P2PPacket{
 
-package ru.asmsoft.p2p;
+    private long version;
+    private Collection<P2PMessage> messages;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-@Component
-public class NodeConfiguration {
-
-    @Value("${p2p.heartbeatPeriod}")
-    long heartbeatPeriod;
-
-    @Value("${p2p.heartbeatExpired}")
-    long heartbeatPeriodExpired;
-
-    public long getHeartbeatPeriod() {
-        return heartbeatPeriod;
+    public UpdateMeResponse(){
+        super();
     }
 
-    public long getHeartbeatPeriodExpired() {
-        return heartbeatPeriodExpired;
+    public UpdateMeResponse(long dbVersion, Collection<P2PMessage> messages, UpdateMePacket request){
+        super();
+        this.version = dbVersion;
+        this.messages = messages;
+        this.uuid = request.getUuid();
+    }
+
+    public long getVersion() {
+        return version;
+    }
+
+    public Collection<P2PMessage> getMessages() {
+        return messages;
+    }
+
+    @Override
+    public String toString() {
+        return "UpdateMeResponse{" +
+                "uuid=" + uuid +
+                ", version=" + version +
+                ", messages=" + messages.size() +
+                '}';
     }
 }

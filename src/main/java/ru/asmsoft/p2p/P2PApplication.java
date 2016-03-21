@@ -36,7 +36,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 @ImportResource("context.xml")
 public class P2PApplication {
+
     public static void main(String[] args) throws Exception {
         SpringApplication.run(P2PApplication.class, args);
     }
+
 }

@@ -24,4 +24,25 @@
 package ru.asmsoft.p2p.packets;
 
 public class CommitTransactionPacket extends P2PPacket {
+
+    private long dbVersion;
+
+    public CommitTransactionPacket() {
+    }
+
+    public CommitTransactionPacket(long dbVersion) {
+        this.dbVersion = dbVersion;
+    }
+
+    public long getDbVersion() {
+        return dbVersion;
+    }
+
+    @Override
+    public String toString() {
+        return "CommitTransactionPacket{" +
+                "dbVersion=" + dbVersion +
+                ", uuid=" + uuid +
+                "}";
+    }
 }

@@ -24,4 +24,18 @@
 package ru.asmsoft.p2p.packets;
 
 public class MessageReceivedPacket extends P2PPacket{
+
+    public MessageReceivedPacket(){}
+
+    public MessageReceivedPacket(MessagePacket packet){
+        super();
+        uuid = packet.getUuid();
+    }
+
+    @Override
+    public String toString() {
+        return "MessageReceivedPacket{" +
+                "uuid=" + uuid +
+                "}";
+    }
 }

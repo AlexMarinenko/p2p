@@ -1,8 +1,9 @@
 /**
  * The MIT License (MIT)
- *
- * Copyright (c) 20.03.16 Alex
- *
+ * <p>
+ * Copyright (c) 21.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -20,28 +21,43 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p.entity;
+package ru.asmsoft.p2p.fsm;
 
-public class Node {
+import org.springframework.stereotype.Component;
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
-    private String address;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-    public Node(String address) {
-        this.address = address;
-    }
 
-    public String getAddress() {
-        return address;
-    }
+@Component
+public class MemoryIncomingBuffer implements IBuffer{
 
-    public void setAddress(String address) {
-        this.address = address;
+    final List<P2PMessage> incomingMessages = new CopyOnWriteArrayList<P2PMessage>();
+
+    @Override
+    public void acceptMessage(P2PMessage message) {
+         incomingMessages.add(message);
     }
 
     @Override
-    public String toString() {
-        return "Node{" +
-                "address='" + address + '\'' +
-                '}';
+    public boolean isEmpty(){
+        return incomingMessages.size() == 0;
+    }
+
+    @Override
+    public List<P2PMessage> getBuffer() {
+        return incomingMessages;
+    }
+
+    @Override
+    public void clear() {
+        incomingMessages.clear();
+    }
+
+    @Override
+    public void add(Collection<P2PMessage> messages){
+        incomingMessages.addAll(messages);
     }
 }

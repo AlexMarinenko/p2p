@@ -26,26 +26,36 @@ package ru.asmsoft.p2p.incoming;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.integration.support.MessageBuilder;
+import org.springframework.statemachine.StateMachine;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-import ru.asmsoft.p2p.entity.P2PMessage;
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
+import ru.asmsoft.p2p.fsm.NodeEvents;
+import ru.asmsoft.p2p.fsm.NodeStates;
 
+/**
+ * Rest controller
+ * Receives incoming messages for a node
+ */
 @RestController
 public class InputController {
 
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    @Qualifier("incomingMessagesService")
-    IMessagesService messagesService;
+    StateMachine<NodeStates, NodeEvents> stateMachine;
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
-    public SendResult sendMessage(@RequestBody P2PMessage message){
-        messagesService.handleIncomingMessage(message);
-        return new SendResult(true);
+    public MessageAcceptResult sendMessage(@RequestBody P2PMessage message){
+
+        // Pass incoming message to the State Machine
+        stateMachine.sendEvent(MessageBuilder.withPayload(NodeEvents.IncomingMessageArrived).setHeader("MESSAGE", message).build());
+        stateMachine.sendEvent(NodeEvents.IncomingMessageAccepted);
+
+        return new MessageAcceptResult(true);
     }
 
 }

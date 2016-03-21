@@ -1,9 +1,8 @@
 /**
  * The MIT License (MIT)
- * <p>
- * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- * <p>
- * <p>
+ *
+ * Copyright (c) 20.03.16 Alex
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -21,10 +20,28 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p.incoming;
+package ru.asmsoft.p2p.storage.entity;
 
-import ru.asmsoft.p2p.entity.P2PMessage;
+public class Node {
 
-public interface IMessagesService {
-    void handleIncomingMessage(P2PMessage message);
+    private String address;
+
+    public Node(String address) {
+        this.address = address;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return "Node{" +
+                "address='" + address + '\'' +
+                '}';
+    }
 }

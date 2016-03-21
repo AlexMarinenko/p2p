@@ -1,9 +1,9 @@
 /**
  * The MIT License (MIT)
- *
+ * <p>
  * Copyright (c) 20.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
- *
- *
+ * <p>
+ * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
@@ -21,28 +21,61 @@
  * THE SOFTWARE.
  */
 
-package ru.asmsoft.p2p.packets;
+package ru.asmsoft.p2p.configuration;
 
-public class RollbackTransactionPacket extends P2PPacket {
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-    private long dbVersion;
+import javax.annotation.PostConstruct;
 
-    public RollbackTransactionPacket() {
-    }
+@Component("nodeConfiguration")
+public class PropertyBasedNodeConfiguration implements INodeConfiguration{
 
-    public RollbackTransactionPacket(long dbVersion) {
-        this.dbVersion = dbVersion;
-    }
+    @Value("${p2p.heartbeatPeriod}")
+    long heartbeatPeriod;
 
-    public long getDbVersion() {
-        return dbVersion;
+    @Value("${p2p.heartbeatExpired}")
+    long heartbeatPeriodExpired;
+
+    @Value("${p2p.broadcastAddress}")
+    String broadcastAddress;
+
+    @Value("${p2p.listenerAddress}")
+    String listenerAddress;
+
+    @Value("${p2p.port}")
+    int port;
+
+    @PostConstruct
+    public void init(){
+        int i = 0;
     }
 
     @Override
-    public String toString() {
-        return "RollbackTransactionPacket{" +
-                "dbVersion=" + dbVersion +
-                ", uuid=" + uuid +
-                "}";
+    public long getHeartbeatPeriod() {
+        return heartbeatPeriod;
     }
+
+    @Override
+    public long getHeartbeatPeriodExpired() {
+        return heartbeatPeriodExpired;
+    }
+
+    @Override
+    public String getBroadcastAddress(){
+        return broadcastAddress;
+    }
+
+    @Override
+    public String getListenerAddress(){
+        return listenerAddress;
+    }
+
+    @Override
+    public int getPort() {
+        return port;
+    }
+
+
+
 }

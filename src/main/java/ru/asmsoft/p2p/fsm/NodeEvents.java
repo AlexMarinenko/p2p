@@ -25,7 +25,7 @@ package ru.asmsoft.p2p.fsm;
 
 public enum NodeEvents {
     StartTransactionReceived, UpdateReceived, CommitReceived, RollbackReceived,
-    IncomingMessageArrived, StartTransactionSent, UpdateRemoteNodes, RollbackSent, CommitSent,
+    IncomingMessageArrived, IncomingMessageAccepted, StartTransactionSent, StartTransactionFailed, UpdateRemoteNodes, RollbackSent, CommitSent,
     UpdateMeRequestReceived, UpdateByRequestSent,
     UpdateMeRequestSent, UpdateByRequestReceived
 }

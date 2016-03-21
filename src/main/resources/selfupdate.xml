@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:int="http://www.springframework.org/schema/integration"
+       xmlns:int-ip="http://www.springframework.org/schema/integration/ip"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration.xsd
+       http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
+       http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
+
+    <int:channel id="outgoing-update-me-channel"/>
+    <int:aggregator
+            input-channel="outgoing-update-me-channel"
+            correlation-strategy-expression="headers[uuid]"
+            release-strategy-expression="size() eq 2"
+            output-channel="update-me-response-received"
+            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
+            expression="#this.![payload]"
+            />
+    <int:channel id="update-me-response-received"/>
+
+
+</beans>
