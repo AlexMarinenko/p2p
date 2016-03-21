@@ -12,6 +12,40 @@
 ------------------------
 Формат сериализации сообщений и протокол общения между узлами - на свой выбор, с обоснованием, почему выбраны конкретные решения. В рамках тестовой задачи можно считать, что узлы находятся в одном VLAN
 
+Использованные сторонние решения:
+---------------------------------
+1. Spring boot / общая структура приложения
+2. Spring integration / организация общего flow
+3. Spring MVC / организация REST контроллера
+4. Spring statemachine / построение FSM для логики работы Node
+5. Jackson / сериализация-десериализация данных
+
+Сборка приложения:
+------------------
+```
+mvn package
+```
+
+Конфигурация приложения:
+------------------------
+```
+cp config/application.properties-dist config/application.properties
+
+nano config/application.properties
+
+p2p.heartbeatPeriod=1000 // период обновления
+p2p.heartbeatExpired=1200 // время после которого узел исключается из рассмотрения
+p2p.broadcastAddress=192.168.99.255 // бродкаст-адрес
+p2p.listenerAddress=0.0.0.0 // адрес для listener-a входящих пакетов
+p2p.port=8888 // UDP-порт
+```
+
+Запуск приложения:
+------------------
+```
+mvn spring-boot:run
+```
+
 
 Transaction flow:
 -----------------
@@ -43,6 +77,14 @@ Client               Node                         Network
    
       
 ```
+
+Send message:
+-------------
+
+```
+curl -X POST --data '{ "content": "test message" }' -H 'Content-type: application/json' http://localhost:8080/send
+```
+
 
 Synchronization flow:
 ---------------------
