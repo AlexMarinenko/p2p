@@ -26,7 +26,10 @@ package ru.asmsoft.p2p.transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.integration.annotation.CorrelationStrategy;
+import org.springframework.integration.annotation.ReleaseStrategy;
 import org.springframework.integration.annotation.ServiceActivator;
+import org.springframework.integration.store.MessageGroup;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.statemachine.StateMachine;
@@ -42,7 +45,10 @@ import ru.asmsoft.p2p.packets.RollbackTransactionPacket;
 import ru.asmsoft.p2p.storage.IMessageRepository;
 import ru.asmsoft.p2p.storage.INodeRepository;
 import ru.asmsoft.p2p.storage.NoChangesetFoundException;
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,22 +72,6 @@ public class OutgoingTransactionManager {
     @Autowired
     INodeConfiguration nodeConfiguration;
 
-    public boolean isTransactionStarted(List<Message> messages){
-        return (nodeRepository.getNodes().size() + 1 == messages.size());
-    }
-
-    public boolean isTransactionConfirmed(List<Message> messages){
-        return (nodeRepository.getNodes().size() + 1 == messages.size());
-    }
-
-    public UUID getCorrelationKeyForStart(P2PPacket packet){
-        return packet.getUuid();
-    }
-
-    public UUID getCorrelationKeyForUpdate(P2PPacket packet){
-        return packet.getUuid();
-    }
-
     private Message prepareResponse(Message requestMessage, P2PPacket response){
 
         return MessageBuilder.withPayload(response)
@@ -93,15 +83,15 @@ public class OutgoingTransactionManager {
     }
 
     @ServiceActivator(inputChannel = "outgoing-start-transaction-started-channel", outputChannel = "outgoing-broadcast")
-    public MessagePacket startUpdateRemoteNodes(){
+    public MessagePacket startUpdateRemoteNodes(Message message){
 
         logger.error("Transaction started. Start updating remote nodes.");
 
+        // Build updating packet
+        MessagePacket packet = new MessagePacket(messageRepository.getDbVersion() + 1, incomingBuffer.copyBuffer());
+
         // Register changeset
         messageRepository.registerChangeset(messageRepository.getDbVersion() + 1, incomingBuffer.getBuffer());
-
-        // Build updating packet
-        MessagePacket packet = new MessagePacket(messageRepository.getDbVersion() + 1, incomingBuffer.getBuffer());
 
         // Clear the pending buffer
         incomingBuffer.clear();
@@ -151,7 +141,7 @@ public class OutgoingTransactionManager {
         // Switch state machine on success
         stateMachine.sendEvent(NodeEvents.CommitSent);
 
-        return new CommitTransactionPacket(messageRepository.getDbVersion() + 1);
+        return new CommitTransactionPacket(messageRepository.getDbVersion());
     }
 
     @ServiceActivator(inputChannel = "outgoing-update-transaction-failed-channel", outputChannel = "outgoing-broadcast")

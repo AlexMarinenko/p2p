@@ -28,7 +28,7 @@
     </int:chain>
 
     <int:payload-type-router id="outgoing-broadcast-router" input-channel="outgoing-broadcast" default-output-channel="nullChannel">
-        <int:mapping type="ru.asmsoft.p2p.packets.StartTransactionPacket" channel="outgoing-transaction-channel"/>
+        <int:mapping type="ru.asmsoft.p2p.packets.StartTransactionPacket" channel="outgoing-start-transaction-channel"/>
         <int:mapping type="ru.asmsoft.p2p.packets.UpdateMePacket" channel="outgoing-update-me-channel"/>
     </int:payload-type-router>
 

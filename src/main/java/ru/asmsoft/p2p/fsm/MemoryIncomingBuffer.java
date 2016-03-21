@@ -26,6 +26,7 @@ package ru.asmsoft.p2p.fsm;
 import org.springframework.stereotype.Component;
 import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -59,5 +60,10 @@ public class MemoryIncomingBuffer implements IBuffer{
     @Override
     public void add(Collection<P2PMessage> messages){
         incomingMessages.addAll(messages);
+    }
+
+    @Override
+    public List<P2PMessage> copyBuffer() {
+        return new ArrayList<P2PMessage>(incomingMessages);
     }
 }

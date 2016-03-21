@@ -75,11 +75,28 @@ public class IncomingTransactionManager {
 
     }
 
+    @ServiceActivator(inputChannel = "incoming-update-me-channel", outputChannel = "outgoing-channel")
+    public Message handeUpdateMeRequest(Message<UpdateMePacket> message){
+
+        logger.info("UpdateMe received: {}", message.toString());
+
+        // Switch state machine
+        stateMachine.sendEvent(NodeEvents.UpdateMeRequestReceived);
+
+        // Prepare response packet
+        UpdateMeResponse packet = new UpdateMeResponse(messageRepository.getDbVersion(), messageRepository.getMessage(), message.getPayload());
+
+        // Send response
+        return prepareResponse(message, packet);
+
+    }
+
     @ServiceActivator(inputChannel = "incoming-start-transaction", outputChannel = "outgoing-channel")
     public Message handeIncomingStartTransaction(Message<StartTransactionPacket> message){
 
         logger.info("Incoming transaction received: {}", message.toString());
 
+        // Switch state machine
         stateMachine.sendEvent(NodeEvents.StartTransactionReceived);
 
         // Prepare response packet
@@ -94,6 +111,7 @@ public class IncomingTransactionManager {
 
         logger.info("Incoming update received: {}", message.toString());
 
+        // Switch state machine
         stateMachine.sendEvent(NodeEvents.UpdateReceived);
 
         // Prepare response packet
@@ -102,6 +120,7 @@ public class IncomingTransactionManager {
         // registerChangeset
         MessagePacket messagePacket = message.getPayload();
         messageRepository.registerChangeset(messagePacket.getDbVersion(), messagePacket.getMessages());
+
 
         // Send response
         return prepareResponse(message, packet);

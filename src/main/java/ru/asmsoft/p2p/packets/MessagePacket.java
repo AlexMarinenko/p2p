@@ -32,6 +32,9 @@ public class MessagePacket extends P2PPacket {
     private long dbVersion;
     private List<P2PMessage> messages;
 
+    public MessagePacket() {
+    }
+
     public MessagePacket(long dbVersion, List<P2PMessage> messages){
         super();
         this.dbVersion = dbVersion;

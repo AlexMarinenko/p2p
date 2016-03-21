@@ -82,4 +82,10 @@ public interface IMessageRepository {
      * @return messages collection in the changeset
      */
     Collection<P2PMessage> cancelChangeset(long dbVersion) throws NoChangesetFoundException;
+
+    /**
+     * Get all messages for update
+     * @return messages from the storage
+     */
+    Collection<P2PMessage> getMessage();
 }

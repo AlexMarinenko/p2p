@@ -12,21 +12,20 @@
         </int:interceptors>
     </int:channel>
 
-    <int:logging-channel-adapter id="loggingChannel1" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.OutgoingTransactionManager"/>
+    <int:logging-channel-adapter id="loggingChannel1" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.StartTransaction"/>
 
     <int:aggregator
-            ref="outgoingTransactionManager"
             input-channel="outgoing-start-transaction-channel"
-            correlation-strategy-method="getCorrelationKeyForStart"
-            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
-            release-strategy-method="isTransactionStarted"
+            correlation-strategy-expression="payload.getUuid()"
+            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod() * 2}"
+            release-strategy-expression="size() eq #{nodesRepository.getNodes().size() + 1}"
             send-partial-result-on-expiry="false"
-            discard-channel="outgoing-start-transaction-failed-channel"
+            discard-channel="outgoing-start-transaction-failed-channel1"
             output-channel="outgoing-start-transaction-started-channel"
             />
 
     <int:channel id="outgoing-start-transaction-started-channel"/>
-    <int:channel id="outgoing-start-transaction-failed-channel"/>
+    <int:publish-subscribe-channel id="outgoing-start-transaction-failed-channel1"/>
 
     <int:channel id="outgoing-update-transaction-channel">
         <int:interceptors>
@@ -34,14 +33,13 @@
         </int:interceptors>
     </int:channel>
 
-    <int:logging-channel-adapter id="loggingChannel2" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.OutgoingTransactionManager"/>
+    <int:logging-channel-adapter id="loggingChannel2" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.UpdateTransaction"/>
 
     <int:aggregator
-            ref="outgoingTransactionManager"
             input-channel="outgoing-update-transaction-channel"
-            correlation-strategy-method="getCorrelationKeyForUpdate"
-            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
-            release-strategy-method="isTransactionConfirmed"
+            correlation-strategy-expression="payload.getUuid()"
+            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod() * 2}"
+            release-strategy-expression="size() eq #{nodesRepository.getNodes().size() + 1}"
             send-partial-result-on-expiry="false"
             discard-channel="outgoing-update-transaction-failed-channel"
             output-channel="outgoing-update-transaction-confirmed-channel"

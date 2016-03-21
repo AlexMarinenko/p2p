@@ -30,11 +30,13 @@
                   <int:mapping type="ru.asmsoft.p2p.packets.MessageReceivedPacket" channel="outgoing-update-transaction-channel"/>
                   <int:mapping type="ru.asmsoft.p2p.packets.CommitTransactionPacket" channel="incoming-commit-transaction"/>
                   <int:mapping type="ru.asmsoft.p2p.packets.RollbackTransactionPacket" channel="incoming-rollback-transaction"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.UpdateMePacket" channel="incoming-update-me-channel"/>
                   <int:mapping type="ru.asmsoft.p2p.packets.UpdateMeResponse" channel="outgoing-update-me-channel"/>
               </int:payload-type-router>
        </int:chain>
 
        <int:channel id="incoming-heartbeat"/>
+        <int:channel id="incoming-update-me-channel"/>
        <int:channel id="incoming-start-transaction"/>
        <int:channel id="incoming-update-transaction"/>
        <int:channel id="incoming-commit-transaction"/>

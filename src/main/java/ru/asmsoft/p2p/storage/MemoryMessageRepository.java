@@ -23,8 +23,9 @@
 
 package ru.asmsoft.p2p.storage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
-import ru.asmsoft.p2p.packets.P2PPacket;
 import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
 import java.util.Collection;
@@ -40,6 +41,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 @Repository
 public class MemoryMessageRepository implements IMessageRepository{
+
+    Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private long version = 0L;
 
@@ -83,6 +86,7 @@ public class MemoryMessageRepository implements IMessageRepository{
 
     @Override
     public void registerChangeset(long dbVersion, List<P2PMessage> messages) {
+        logger.info("Register changeset: {} size: {}", dbVersion, messages.size());
         changesets.put(dbVersion, messages);
     }
 
@@ -111,6 +115,11 @@ public class MemoryMessageRepository implements IMessageRepository{
 
         return changeset;
 
+    }
+
+    @Override
+    public Collection<P2PMessage> getMessage() {
+        return messages;
     }
 
 }

@@ -37,4 +37,6 @@ public interface IBuffer {
     void clear();
 
     void add(Collection<P2PMessage> messages);
+
+    List<P2PMessage> copyBuffer();
 }
