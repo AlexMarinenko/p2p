@@ -46,6 +46,53 @@ p2p.port=8888 // UDP-порт
 mvn spring-boot:run
 ```
 
+Heartbeat:
+----------
+
+```
+Node                           Network
+-----                          -------
+  |                               |
+  | Incoming Heartbeat broadcast  |
+  |<------------------------------|
+  |                               |
+  | Refresh nodelist              |
+  |--------+                      |
+  |        |                      |
+  |<-------+                      |
+  |                               |
+  
+```
+
+Synchronization flow:
+---------------------
+
+```
+Node                           Network
+-----                          -------
+  |                               |
+  | Incoming Heartbeat broadcast  |
+  |<------------------------------|
+  |    contains DB version        |
+  |                               |
+  | Compare local cache version   |  
+  |----------+                    | 
+  |          |                    |
+  |<---------+                    |
+  |                               |
+  |  UpdateMeRequest              |  
+  |------------------------------>|
+  |  UpdateResponse               |
+  |<------------------------------|
+  |                               |      
+  | Update local cache            | 
+  |--------+                      | 
+  |        |                      | 
+  |<-------+                      | 
+  |                               | 
+  
+```
+
 
 Transaction flow:
 -----------------
@@ -68,14 +115,15 @@ Client               Node                         Network
    |                   | Message Packet              |
    |                   |---------------------------->|
    |                   |                             |   
-   |                   | Message Received            |
+   |                   | Confirm Message Received    |
    |                   |<----------------------------|
    |                   |                             |   
    |                   | Commit                      |
    |                   |---------------------------->|
-   
-   
-      
+   |                   | Rollback                    |   
+   |                   |---------------------------->|
+   |                   |                             |
+    
 ```
 
 Send message:
@@ -85,63 +133,6 @@ Send message:
 curl -X POST --data '{ "content": "test message" }' -H 'Content-type: application/json' http://localhost:8080/send
 ```
 
-
-Synchronization flow:
----------------------
-
-```
-Node                         Network          Selected Node
------                        -------          -------------
-  |                             |                   |
-  | Syncronization Request      |                   |
-  |---------------------------->|                   |
-  |                             |                   |
-  | Versions responses          |                   |
-  |<============================|                   |
-  |                             |                   |
-  | Select a node having max v  |                   |
-  |---------+                   |                   |
-  |         |                   |                   |
-  |<--------+                   |                   |
-  |                             |                   |
-  | Get last DB request         |                   |
-  |------------------------------------------------>|
-  |                             |                   |
-  | Last DB dat                 |                   |
-  |<------------------------------------------------|
-  |                             |                   |
-  | Update local cache          |                   |
-  |--------+                    |                   |
-  |        |                    |                   |
-  |<-------+                    |                   |
-  |                             |                   |
-  
-```
-
-Heartbeat:
-----------
-
-```
-Node                         Network
------                        -------
-  |                             |
-  | Ping broadcast (T=100ms)    |
-  |---------------------------->|
-  |                             |
-    
-Node                         Network
------                        -------
-  |                             |
-  | Incoming Ping broadcast     |
-  |<----------------------------|
-  |                             |
-  | Refresh nodelist            |
-  |--------+                    |
-  |        |                    |
-  |<-------+                    |
-  |                             |
-  
-```
 
 Node state machine:
 -------------------
