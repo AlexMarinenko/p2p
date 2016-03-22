@@ -28,13 +28,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.statemachine.StateMachine;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-import ru.asmsoft.p2p.storage.entity.P2PMessage;
+import org.springframework.web.bind.annotation.*;
 import ru.asmsoft.p2p.fsm.NodeEvents;
 import ru.asmsoft.p2p.fsm.NodeStates;
+import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
 /**
  * Rest controller
@@ -50,7 +47,15 @@ public class InputController {
 
     @RequestMapping(value = "/send", method = RequestMethod.POST)
     public MessageAcceptResult sendMessage(@RequestBody P2PMessage message){
+        return acceptMessage(message);
+    }
 
+    @RequestMapping(value = "/send", method = RequestMethod.GET)
+    public MessageAcceptResult sendMessage(@RequestParam("message") String message){
+        return acceptMessage(new P2PMessage(message));
+    }
+
+    private MessageAcceptResult acceptMessage(P2PMessage message) {
         // Pass incoming message to the State Machine
         stateMachine.sendEvent(MessageBuilder.withPayload(NodeEvents.IncomingMessageArrived).setHeader("MESSAGE", message).build());
         stateMachine.sendEvent(NodeEvents.IncomingMessageAccepted);
