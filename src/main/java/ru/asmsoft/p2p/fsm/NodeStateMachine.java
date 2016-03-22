@@ -84,7 +84,6 @@ public class NodeStateMachine extends EnumStateMachineConfigurerAdapter<NodeStat
                     .event(NodeEvents.RollbackReceived)
 
 
-
                 .and()
                     .withExternal()
                     .source(NodeStates.CONNECTED).target(NodeStates.INCOMING_MESSAGE_RECEIVED)
@@ -105,6 +104,7 @@ public class NodeStateMachine extends EnumStateMachineConfigurerAdapter<NodeStat
                     .withExternal()
                     .source(NodeStates.STARTED_TRANSACTION).target(NodeStates.UPDATING_REMOTE)
                     .event(NodeEvents.UpdateRemoteNodes)
+
                 .and()
                     .withExternal()
                     .source(NodeStates.UPDATING_REMOTE).target(NodeStates.CONNECTED)

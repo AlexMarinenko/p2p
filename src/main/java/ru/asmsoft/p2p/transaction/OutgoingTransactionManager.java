@@ -26,8 +26,6 @@ package ru.asmsoft.p2p.transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.integration.annotation.CorrelationStrategy;
-import org.springframework.integration.annotation.ReleaseStrategy;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.store.MessageGroup;
 import org.springframework.integration.support.MessageBuilder;
@@ -45,12 +43,6 @@ import ru.asmsoft.p2p.packets.RollbackTransactionPacket;
 import ru.asmsoft.p2p.storage.IMessageRepository;
 import ru.asmsoft.p2p.storage.INodeRepository;
 import ru.asmsoft.p2p.storage.NoChangesetFoundException;
-import ru.asmsoft.p2p.storage.entity.P2PMessage;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
 
 @Service("outgoingTransactionManager")
 public class OutgoingTransactionManager {
@@ -82,24 +74,14 @@ public class OutgoingTransactionManager {
 
     }
 
-    @ServiceActivator(inputChannel = "outgoing-start-transaction-started-channel", outputChannel = "outgoing-broadcast")
-    public MessagePacket startUpdateRemoteNodes(Message message){
+    @ServiceActivator(inputChannel = "outgoing-start-transaction-started-channel")
+    public void startUpdateRemoteNodes(Message message){
 
-        logger.error("Transaction started. Start updating remote nodes.");
-
-        // Build updating packet
-        MessagePacket packet = new MessagePacket(messageRepository.getDbVersion() + 1, incomingBuffer.copyBuffer());
-
-        // Register changeset
-        messageRepository.registerChangeset(messageRepository.getDbVersion() + 1, incomingBuffer.getBuffer());
-
-        // Clear the pending buffer
-        incomingBuffer.clear();
+        logger.info("Transaction started. Start updating remote nodes.");
 
         // Switch state machine
         stateMachine.sendEvent(NodeEvents.UpdateRemoteNodes);
 
-        return packet;
     }
 
     @ServiceActivator(inputChannel = "outgoing-start-transaction-failed-channel")
@@ -121,7 +103,7 @@ public class OutgoingTransactionManager {
     @ServiceActivator(inputChannel = "outgoing-update-transaction-confirmed-channel", outputChannel = "outgoing-broadcast")
     public P2PPacket updateConfirmationsReceived(){
 
-        logger.error("Transaction update confirmed. Committing.");
+        logger.info("Transaction update confirmed. Committing.");
 
         // Apply the changes
         try {

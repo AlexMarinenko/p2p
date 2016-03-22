@@ -16,7 +16,11 @@
                id="inbound-adapter"
                local-address="#{nodeConfiguration.getListenerAddress()}"
                port="#{nodeConfiguration.getPort()}"
-               channel="incoming-json"/>
+               channel="incoming-udp"/>
+
+       <int:channel id="incoming-udp"/>
+
+       <int:filter ref="localAddressesFilteringService" method="isPacketAllowed" input-channel="incoming-udp" output-channel="incoming-json"/>
 
        <int:channel id="incoming-json"/>
 
@@ -31,7 +35,7 @@
                   <int:mapping type="ru.asmsoft.p2p.packets.CommitTransactionPacket" channel="incoming-commit-transaction"/>
                   <int:mapping type="ru.asmsoft.p2p.packets.RollbackTransactionPacket" channel="incoming-rollback-transaction"/>
                   <int:mapping type="ru.asmsoft.p2p.packets.UpdateMePacket" channel="incoming-update-me-channel"/>
-                  <int:mapping type="ru.asmsoft.p2p.packets.UpdateMeResponse" channel="outgoing-update-me-channel"/>
+                  <int:mapping type="ru.asmsoft.p2p.packets.UpdateMeResponse" channel="outgoing-update-me-channel-enricher"/>
               </int:payload-type-router>
        </int:chain>
 

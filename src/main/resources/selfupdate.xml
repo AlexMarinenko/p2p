@@ -9,15 +9,26 @@
        http://www.springframework.org/schema/integration/ip http://www.springframework.org/schema/integration/ip/spring-integration-ip.xsd
        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task.xsd">
 
+    <int:channel id="outgoing-update-me-channel-enricher"/>
+    <int:header-enricher input-channel="outgoing-update-me-channel-enricher" output-channel="outgoing-update-me-channel">
+        <int:header name="uuid" expression="payload.getUuid()"/>
+    </int:header-enricher>
+
     <int:channel id="outgoing-update-me-channel"/>
-    <int:aggregator
-            input-channel="outgoing-update-me-channel"
-            correlation-strategy-expression="headers[uuid]"
-            release-strategy-expression="size() eq 2"
-            output-channel="update-me-response-received"
-            group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
-            expression="#this.![payload]"
-            />
+
+    <int:chain input-channel="outgoing-update-me-channel">
+        <int:aggregator
+                correlation-strategy-expression="headers[uuid]"
+                release-strategy-expression="size() eq 2"
+                group-timeout-expression="#{nodeConfiguration.getHeartbeatPeriod()}"
+                expression="#this.![payload]"
+                />
+        <int:splitter/>
+        <int:payload-type-router default-output-channel="nullChannel">
+            <int:mapping type="ru.asmsoft.p2p.packets.UpdateMeResponse" channel="update-me-response-received"/>
+        </int:payload-type-router>
+    </int:chain>
+
     <int:channel id="update-me-response-received"/>
 
 

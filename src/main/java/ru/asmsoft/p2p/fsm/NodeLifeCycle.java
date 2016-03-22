@@ -32,7 +32,9 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.statemachine.StateContext;
 import org.springframework.statemachine.annotation.OnTransitionEnd;
 import org.springframework.statemachine.annotation.WithStateMachine;
+import ru.asmsoft.p2p.packets.MessagePacket;
 import ru.asmsoft.p2p.packets.StartTransactionPacket;
+import ru.asmsoft.p2p.storage.IMessageRepository;
 import ru.asmsoft.p2p.storage.INodeRepository;
 import ru.asmsoft.p2p.storage.entity.P2PMessage;
 
@@ -52,13 +54,36 @@ public class NodeLifeCycle {
     @Qualifier("outgoing-broadcast")
     private MessageChannel outgoingBroadcastChannel;
 
+    @Autowired
+    private IMessageRepository messageRepository;
+
     @OnTransitionEnd(target = "CONNECTED")
     public void onConnected(StateContext<NodeStates, NodeEvents> contextState){
         if (!incomingBuffer.isEmpty()){
-            StartTransactionPacket startTransactionPacket = new StartTransactionPacket();
-            outgoingBroadcastChannel.send(MessageBuilder.withPayload(startTransactionPacket).setHeader("uuid", startTransactionPacket.getUuid()).build());
             contextState.getStateMachine().sendEvent(NodeEvents.StartTransactionSent);
         }
+    }
+
+    @OnTransitionEnd(target = "STARTED_TRANSACTION")
+    public void sendTransactionPacket(){
+        StartTransactionPacket startTransactionPacket = new StartTransactionPacket();
+        outgoingBroadcastChannel.send(MessageBuilder.withPayload(startTransactionPacket).setHeader("uuid", startTransactionPacket.getUuid()).build());
+    }
+
+    @OnTransitionEnd(target = "UPDATING_REMOTE")
+    public void sendUpdatePacket(){
+
+        // Build updating packet
+        MessagePacket packet = new MessagePacket(messageRepository.getDbVersion() + 1, incomingBuffer.copyBuffer());
+
+        // Register changeset
+        messageRepository.registerChangeset(messageRepository.getDbVersion() + 1, incomingBuffer.getBuffer());
+
+        // Clear the pending buffer
+        incomingBuffer.clear();
+
+        // Send the update packet to broadcast
+        outgoingBroadcastChannel.send(MessageBuilder.withPayload(packet).build());
     }
 
     @OnTransitionEnd(target = "INCOMING_MESSAGE_RECEIVED")

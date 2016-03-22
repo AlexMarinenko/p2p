@@ -14,6 +14,8 @@
 
     <int:logging-channel-adapter id="loggingChannel1" level="INFO" log-full-message="true" logger-name="ru.asmsoft.p2p.transaction.StartTransaction"/>
 
+    <!-- release-strategy-expression="size() eq #{nodesRepository.getNodes().size() + 1}" -->
+    <!-- release-strategy-method="canRelease" -->
     <int:aggregator
             input-channel="outgoing-start-transaction-channel"
             correlation-strategy-expression="payload.getUuid()"

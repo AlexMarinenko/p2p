@@ -86,6 +86,9 @@ public class IncomingTransactionManager {
         // Prepare response packet
         UpdateMeResponse packet = new UpdateMeResponse(messageRepository.getDbVersion(), messageRepository.getMessage(), message.getPayload());
 
+        // Switch state machine
+        stateMachine.sendEvent(NodeEvents.UpdateByRequestSent);
+
         // Send response
         return prepareResponse(message, packet);
 

@@ -1,9 +1,7 @@
-package ru.asmsoft.p2p.packets;
-
 /**
  * The MIT License (MIT)
  * <p>
- * Copyright (c) 21.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
+ * Copyright (c) 22.03.16 <Alex S. Marinenko> alex.marinenko@gmail.com
  * <p>
  * <p>
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,16 +20,11 @@ package ru.asmsoft.p2p.packets;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-public class UpdateMePacket extends P2PPacket{
 
-    public UpdateMePacket(){
-        super();
-    }
+package ru.asmsoft.p2p.incoming;
 
-    @Override
-    public String toString() {
-        return "UpdateMePacket{" +
-                "uuid=" + uuid+
-                "}";
-    }
+import org.springframework.messaging.Message;
+
+public interface IPacketsFilteringService {
+    boolean isPacketAllowed(Message message);
 }

@@ -1,9 +1,12 @@
 package ru.asmsoft.p2p.heartbeat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.annotation.ServiceActivator;
 import org.springframework.integration.support.MessageBuilder;
+import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.statemachine.StateMachine;
 import org.springframework.stereotype.Service;
@@ -39,9 +42,15 @@ import ru.asmsoft.p2p.storage.IMessageRepository;
 @Service
 public class SelfUpdateService implements ISelfUpdateService {
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     @Autowired
     @Qualifier("outgoing-channel")
     private MessageChannel outgoingChannel;
+
+    @Autowired
+    @Qualifier("outgoing-update-me-channel")
+    private MessageChannel outgoingUpdateMeChannel;
 
     @Autowired
     private INodeConfiguration nodeConfiguration;
@@ -57,14 +66,16 @@ public class SelfUpdateService implements ISelfUpdateService {
 
         UpdateMePacket updateMePacket = new UpdateMePacket();
 
+        Message outgoingMessage = MessageBuilder.withPayload(updateMePacket)
+                .setHeader("ip_address", nodeAddress)
+                .setHeader("ip_port", nodeConfiguration.getPort())
+                .setHeader("uuid", updateMePacket.getUuid())
+                .build();
+
         // Send UpdateMePacket
-        outgoingChannel.send(
-                MessageBuilder.withPayload(updateMePacket)
-                        .setHeader("ip_address", nodeAddress)
-                        .setHeader("ip_port", nodeConfiguration.getPort())
-                        .setHeader("uuid", updateMePacket.getUuid())
-                        .build()
-        );
+        outgoingChannel.send(outgoingMessage);
+
+        outgoingUpdateMeChannel.send(outgoingMessage);
 
         // Switch state machine
         stateMachine.sendEvent(NodeEvents.UpdateMeRequestSent);
@@ -73,6 +84,8 @@ public class SelfUpdateService implements ISelfUpdateService {
 
     @ServiceActivator(inputChannel = "update-me-response-received")
     public void updateReceived(UpdateMeResponse updateMeResponse){
+
+        logger.info("Synchronize local DB to latest version: {}, size: {}", updateMeResponse.getVersion(), updateMeResponse.getMessages().size());
 
         messageRepository.syncDb(updateMeResponse.getVersion(), updateMeResponse.getMessages());
 
